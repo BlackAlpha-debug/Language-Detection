@@ -1,7 +1,3 @@
-Sure! Here's a clean, professional version of the `README.md` file **without emojis**:
-
----
-
 # Language Recognition Classifier
 
 This project applies Natural Language Processing (NLP) and Machine Learning techniques to classify the **language** of a given text input. Two classifiers are used for comparison: **Decision Tree** and **Multinomial Naive Bayes**.
@@ -26,7 +22,7 @@ The dataset used is a CSV file with the following relevant columns:
 Install the required Python libraries using:
 
 ```bash
-pip install pandas numpy matplotlib seaborn nltk scikit-learn
+pip install pandas numpy matplotlib seaborn nltk scikit-learn flask
 ```
 
 ## Preprocessing Steps
@@ -61,7 +57,42 @@ The following metrics are used to evaluate the models:
 
 Results are visualized using a Seaborn heatmap for easy comparison.
 
-## Sample Predictions
+## Web Application (Flask)
+
+A simple web interface is built using **Flask** to allow users to input a sentence and receive the predicted language in real time.
+
+### To Run the Flask App Locally:
+
+1. Make sure all required libraries are installed.
+2. Navigate to the project directory.
+3. Run the Flask app:
+
+```bash
+python app.py
+```
+
+4. Open your browser and go to `http://127.0.0.1:5000/`.
+
+### Frontend Files
+
+The frontend is built using HTML, CSS, and JavaScript to provide a user-friendly interface.
+
+#### Directory Structure
+
+```
+.
+├── app.py                          # Flask backend
+├── language_recognition.ipynb     # Jupyter notebook for model training and testing
+├── Language recognition dataset.csv
+├── static/
+│   └── style.css                  # CSS styling
+├── templates/
+│   └── index.html                 # Frontend HTML page
+├── script.js                      # JavaScript logic (if separate from HTML)
+├── README.md
+```
+
+## Sample Predictions (Backend)
 
 The following are example predictions using the trained Multinomial Naive Bayes classifier:
 
@@ -73,27 +104,16 @@ predict("comment allez-vous")  # Expected: French
 predict("兄弟")                 # Expected: Chinese
 ```
 
-## File Structure
-
-```
-.
-├── language_recognition.ipynb
-├── Language recognition dataset.csv
-├── README.md
-```
-
-## How to Run
+## How to Run (CLI or Notebook)
 
 1. Load and clean the dataset.
 2. Vectorize text using TF-IDF.
 3. Train both models on the training set.
 4. Evaluate on the test set using classification metrics.
-5. Use the `predict()` function to classify new text samples.
+5. Use the `predict()` function or the web interface to classify new text samples.
 
 ## Author
+muzaammil jawad
 
-This project was developed for educational purposes to demonstrate basic language detection using scikit-learn.
+This project was developed for educational purposes to demonstrate basic language detection using scikit-learn and Flask.
 
----
-
-Would you like this content exported as a `.md` file?
