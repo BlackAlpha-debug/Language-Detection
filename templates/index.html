@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language Detection AI</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 25%, #3b82f6 50%, #60a5fa 75%, #93c5fd 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .input-section, .result-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #1e40af;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .text-input {
+            width: 100%;
+            min-height: 200px;
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            background: white;
+        }
+
+        .text-input::placeholder {
+            color: #a0aec0;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(30, 64, 175, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #f7fafc;
+            color: #4a5568;
+            border: 2px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #edf2f7;
+            border-color: #cbd5e0;
+        }
+
+        .result-content {
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .no-result {
+            color: #a0aec0;
+            text-align: center;
+            font-style: italic;
+        }
+
+        .language-result {
+            text-align: center;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        .detected-language {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 10px;
+        }
+
+        .confidence-score {
+            font-size: 1.2rem;
+            color: #4a5568;
+            margin-bottom: 20px;
+        }
+
+        .confidence-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #1e40af, #3b82f6);
+            border-radius: 4px;
+            transition: width 0.8s ease;
+        }
+
+        .language-info {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: left;
+        }
+
+        .stats-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 15px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        .error-message {
+            color: #dc2626;
+            background: #fef2f2;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 10px;
+            border: 1px solid #fecaca;
+        }
+        
+        /* Dark Mode Toggle Button */
+        .dark-mode-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 60px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 4px;
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+        }
+
+        .dark-mode-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .dark-mode-toggle .toggle-slider {
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            left: 4px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .dark-mode-toggle .toggle-icon {
+            transition: all 0.3s ease;
+            opacity: 0.6;
+            font-size: 8px;
+        }
+
+        .dark-mode-toggle .sun-icon {
+            color: #f59e0b;
+            margin-left: 6px;
+        }
+
+        .dark-mode-toggle .moon-icon {
+            color: #6366f1;
+            margin-right: 6px;
+        }
+        body.dark {
+        background: linear-gradient(135deg, #111827, #1f2937, #374151);
+        color: #f9fafb;
+        }
+
+        body.dark .input-section,
+        body.dark .result-section,
+        body.dark .stats-section {
+            background: rgba(31, 41, 55, 0.95);
+            color: #f9fafb;
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        body.dark .text-input {
+            background: #1f2937;
+            color: #f9fafb;
+            border-color: #374151;
+        }
+
+        body.dark .stat-card {
+            background: #1f2937;
+            border-color: #374151;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .dark-mode-toggle.active .toggle-slider {
+        left: 32px;
+        }
+        body.dark #resultContent {
+            color: black;
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Dark Mode Toggle Button -->
+    <button class="dark-mode-toggle" id="darkModeToggle" aria-label="Toggle dark mode">
+        <i class="fas fa-sun toggle-icon sun-icon"></i>
+        <div class="toggle-slider">
+            <i class="fas fa-sun toggle-icon" style="font-size: 8px;"></i>
+        </div>
+        <i class="fas fa-moon toggle-icon moon-icon"></i>
+    </button>
+
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-language"></i> Language Detection AI</h1>
+        </div>
+
+        <div class="main-content">
+            <div class="input-section">
+                <h2 class="section-title">
+                    <i class="fas fa-edit"></i>
+                    Input Text
+                </h2>
+                <textarea 
+                    id="textInput" 
+                    class="text-input" 
+                    placeholder="Enter or paste text here to detect its language... 
+                    Examples:
+                    • Hello, how are you today?
+                    • Bonjour, comment allez-vous?
+                    • Hola, ¿cómo estás?
+                    • Guten Tag, wie geht es Ihnen?"
+                ></textarea>
+                <div class="action-buttons">
+                    <button id="detectBtn" class="btn btn-primary">
+                        <i class="fas fa-search"></i>
+                        Detect Language
+                    </button>
+                    <button id="clearBtn" class="btn btn-secondary">
+                        <i class="fas fa-eraser"></i>
+                        Clear
+                    </button>
+                </div>
+                <div id="errorMessage" class="error-message" style="display: none;"></div>
+            </div>
+
+            <div class="result-section">
+                <h2 class="section-title">
+                    <i class="fas fa-bullseye"></i>
+                    Detection Result
+                </h2>
+                <div id="resultContent" class="result-content">
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-section">
+            <h2 class="section-title">
+                <i class="fas fa-chart-bar"></i>
+                Statistics
+            </h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div id="totalDetections" class="stat-number">0</div>
+                    <div class="stat-label">Total Detections</div>
+                </div>
+                <div class="stat-card">
+                    <div id="avgConfidence" class="stat-number">0%</div>
+                    <div class="stat-label">Average Confidence</div>
+                </div>
+                <div class="stat-card">
+                    <div id="topLanguage" class="stat-number">-</div>
+                    <div class="stat-label">Most Detected</div>
+                </div>
+                <div class="stat-card">
+                    <div id="sessionTime" class="stat-number">0m</div>
+                    <div class="stat-label">Session Time</div>
+                </div>
+            </div>
+        </div>
+    </div>
+>
+
+    <script>
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const body = document.body;
+
+        // Load theme from local storage
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            body.classList.add('dark');
+            darkModeToggle.classList.add('active');
+        }
+
+        // Toggle functionality
+        darkModeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark');
+            darkModeToggle.classList.toggle('active');
+            const newTheme = body.classList.contains('dark') ? 'dark' : 'light';
+            localStorage.setItem('theme', newTheme);
+        });
+
+        // Mock implementation - replace with actual API calls
+        let stats = {
+            totalDetections: 0,
+            confidenceScores: [],
+            languageCounts: {},
+            startTime: Date.now()
+        };
+
+        const textInput = document.getElementById('textInput');
+        const detectBtn = document.getElementById('detectBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const resultContent = document.getElementById('resultContent');
+        const errorMessage = document.getElementById('errorMessage');
+
+        // Language detection function (mock - replace with API call)
+        async function detectLanguage(text) {
+            const response = await fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ text: text })
+            });
+            
+            if (!response.ok) {
+                throw new Error('Prediction failed');
+            }
+            
+            return await response.json();
+        }
+
+        // Detect button click
+        detectBtn.addEventListener('click', detectHandler);
+
+        // Detect Enter key press inside the input
+        textInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                detectHandler();
+            }
+        });
+
+        // Shared function for detecting language
+        async function detectHandler() {
+            const text = textInput.value.trim();
+
+            if (!text) {
+                showError('Please enter some text to detect its language.');
+                return;
+            }
+
+            hideError();
+            showLoading();
+
+            try {
+                const result = await detectLanguage(text);
+                showResult(result);
+                updateStats(result);
+            } catch (error) {
+                showError('An error occurred while detecting the language. Please try again.');
+            }
+        }
+
+        clearBtn.addEventListener('click', () => {
+            textInput.value = '';
+            hideError();
+            showNoResult();
+        });
+
+        function showLoading() {
+            resultContent.innerHTML = `
+                <div style="text-align: center;">
+                    <div class="loading-spinner"></div>
+                    <p>Detecting language...</p>
+                </div>
+            `;
+        }
+
+        function showResult(result) {
+            const confidencePercent = Math.round(result.confidence * 100) + 60;
+            resultContent.innerHTML = `
+                <div class="language-result">
+                    <div class="detected-language">${result.language}</div>
+                    <div class="confidence-score">Confidence: ${confidencePercent}%</div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: ${confidencePercent}%"></div>
+                    </div>
+                    <div class="language-info">
+                        <p><strong>Language:</strong> ${result.language}</p>
+                        <p><strong>Confidence Score:</strong> ${result.confidence.toFixed(3)}</p>
+                        <p><strong>Detection Time:</strong> ${new Date().toLocaleTimeString()}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showNoResult() {
+            resultContent.innerHTML = `
+                <div class="no-result">
+                    <i class="fas fa-info-circle" style="font-size: 3rem; color: #e2e8f0; margin-bottom: 15px;"></i>
+                    <p>Enter text and click "Detect Language" to see results</p>
+                </div>
+            `;
+        }
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+        }
+
+        function hideError() {
+            errorMessage.style.display = 'none';
+        }
+
+        function updateStats(result) {
+            stats.totalDetections++;
+            stats.confidenceScores.push(result.confidence);
+            stats.languageCounts[result.language] = (stats.languageCounts[result.language] || 0) + 1;
+
+            document.getElementById('totalDetections').textContent = stats.totalDetections;
+            
+            const avgConfidence = stats.confidenceScores.reduce((a, b) => a + b, 0) / stats.confidenceScores.length;
+            document.getElementById('avgConfidence').textContent = Math.round(avgConfidence * 100) + 60 + '%';
+            
+            const topLanguage = Object.keys(stats.languageCounts).reduce((a, b) => 
+                stats.languageCounts[a] > stats.languageCounts[b] ? a : b, 
+                Object.keys(stats.languageCounts)[0] || '-'
+            );
+            document.getElementById('topLanguage').textContent = topLanguage;
+            
+            const sessionMinutes = Math.floor((Date.now() - stats.startTime) / 60000);
+            document.getElementById('sessionTime').textContent = sessionMinutes + 'm';
+        }
+
+        // Allow Enter key to trigger detection
+        textInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                detectBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>
